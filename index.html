@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Engineer World's Fair 2026 · Field Report</title>
+<style>
+  :root{
+    --cream:#F7F3E8;
+    --card:#FFFDF6;
+    --ink:#1A1712;
+    --soft:#5C554A;
+    --accent:#8F6E14;         /* deep ochre — eyebrow text, yellow family, readable */
+    --yellow:#F2DE8E;         /* pastel yellow — highlights, pills, divider */
+    --yellow-soft:#F9F0CE;
+    --line:#E7DFC9;
+    --serif:"Charter","Iowan Old Style",Georgia,"Times New Roman",serif;
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;overflow:hidden;background:var(--ink);font-family:var(--serif);}
+
+  #stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;}
+  .slide{
+    position:absolute;inset:0;
+    background:var(--cream);color:var(--ink);
+    padding:88px 110px 72px;
+    opacity:0;visibility:hidden;transform:translateY(8px);
+    transition:opacity .4s ease,transform .4s ease,visibility .4s;
+  }
+  .slide.active{opacity:1;visibility:visible;transform:translateY(0);}
+  .slide.accent{background:var(--yellow);}
+  @media (prefers-reduced-motion: reduce){ .slide{transition:none;transform:none;} }
+
+  /* page number, his "11 / 40" */
+  .pg{
+    position:absolute;bottom:30px;right:40px;
+    font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.06em;
+    color:var(--soft);
+  }
+
+  /* eyebrow label */
+  .eyebrow{
+    font-family:var(--sans);font-size:13px;font-weight:700;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--accent);
+    margin-bottom:22px;
+  }
+  h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;}
+  h2{font-size:46px;line-height:1.12;margin-bottom:18px;max-width:900px;}
+  .sub{font-size:21px;line-height:1.5;max-width:640px;color:var(--ink);}
+  .mark{background:linear-gradient(transparent 55%, var(--yellow) 55%);padding:0 .05em;}
+
+  ul.points{list-style:none;margin-top:30px;max-width:600px;}
+  ul.points li{
+    position:relative;padding-left:26px;margin-bottom:18px;
+    font-size:19px;line-height:1.5;
+  }
+  ul.points li::before{
+    content:"";position:absolute;left:2px;top:11px;width:9px;height:9px;border-radius:50%;
+    background:var(--yellow);border:1.5px solid var(--accent);
+  }
+  ul.points b{font-weight:700;}
+
+  /* white card, his signature surface */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 1px 3px rgba(26,23,18,.05);
+    padding:26px 30px;
+  }
+  .card .cap{
+    font-family:var(--sans);font-size:11.5px;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;
+  }
+  .card p{font-size:19px;line-height:1.45;}
+
+  /* pill, his "Opus 4.8" badges */
+  .pill{
+    display:inline-block;font-family:var(--sans);font-size:12px;font-weight:700;
+    padding:5px 14px;border-radius:999px;background:#EDE7D4;color:var(--soft);
+  }
+  .pill.hot{background:var(--yellow);color:var(--ink);border:1px solid var(--accent);}
+
+  .cols{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;align-items:center;height:100%;}
+  .fig{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .fig svg{width:100%;height:auto;max-height:352px;display:block;}
+  .fig text{font-family:var(--sans);}
+  .fig .serif{font-family:var(--serif);}
+
+  .center{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+
+  /* title */
+  #s1 .logo{width:220px;margin-bottom:60px;border-radius:6px;}
+  #s1 h1{font-size:56px;line-height:1.14;max-width:940px;}
+  #s1 h1 em{font-style:italic;}
+  #s1 .meta{margin-top:44px;font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);}
+  #s1 .meta2{margin-top:12px;font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--soft);}
+
+  /* stats */
+  .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 3px rgba(26,23,18,.05);padding:26px 28px 22px;}
+  .stat .n{font-family:var(--serif);font-size:52px;font-weight:500;letter-spacing:-.02em;line-height:1;}
+  .stat .l{font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-top:12px;color:var(--soft);}
+
+  /* photo grid: 3 large over 4 small */
+  .photos{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:34px;}
+  .photo{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 3px rgba(26,23,18,.05);padding:9px 9px 10px;grid-column:span 4;}
+  .photo img{width:100%;height:185px;object-fit:cover;border-radius:8px;display:block;}
+  .photo.sm{grid-column:span 3;}
+  .photo.sm img{height:130px;}
+  .photo .cap2{font-family:var(--sans);font-size:10.5px;font-weight:500;color:var(--soft);margin-top:8px;line-height:1.35;}
+  .figphoto{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 3px rgba(26,23,18,.05);padding:12px 12px 14px;width:100%;}
+  .figphoto img{width:100%;max-height:380px;object-fit:cover;object-position:top;border-radius:8px;display:block;}
+  .figphoto .cap2{font-family:var(--sans);font-size:11.5px;font-weight:500;color:var(--soft);margin-top:10px;}
+
+  /* snapshot polaroids from the phone camera roll */
+  .snap{
+    width:212px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    box-shadow:0 2px 8px rgba(26,23,18,.14);padding:7px 7px 8px;
+    transform:rotate(2.2deg);align-self:flex-end;margin-top:14px;
+  }
+  .snap.l{transform:rotate(-2.2deg);align-self:flex-start;}
+  .snap img{width:100%;height:120px;object-fit:cover;border-radius:6px;display:block;}
+  .snap .cap2{font-family:var(--sans);font-size:9.5px;font-weight:500;color:var(--soft);margin-top:6px;line-height:1.35;}
+  .snaprow{display:flex;gap:26px;margin-top:46px;justify-content:center;}
+  .snaprow .snap{align-self:auto;margin-top:0;width:224px;}
+  .snaprow .snap:nth-child(2){transform:rotate(-1.8deg);margin-top:-8px;}
+  .snaprow .snap img{height:128px;}
+
+  /* progression cards with arrows, his AskUserQuestion layout */
+  .prog{display:grid;grid-template-columns:1fr 36px 1fr 36px 1fr;gap:0;align-items:stretch;margin-top:56px;}
+  .prog .arrow{align-self:center;text-align:center;font-family:var(--sans);font-size:22px;color:var(--soft);}
+  .prog .card{display:flex;flex-direction:column;}
+  .prog .card h3{font-family:var(--serif);font-weight:500;font-size:25px;line-height:1.15;margin:10px 0 10px;}
+  .prog .card p{font-size:15.5px;line-height:1.45;color:var(--ink);}
+  .prog .card .pill{align-self:flex-start;}
+
+  /* dividers, his coral part-break */
+  .divider{height:100%;display:flex;flex-direction:column;justify-content:flex-end;position:relative;}
+  .divider .part{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+  .divider h2{font-size:64px;margin-bottom:6px;}
+  .divider .items{font-size:20px;font-style:italic;color:var(--ink);opacity:.85;}
+  .divider svg{position:absolute;top:40px;right:20px;width:520px;height:auto;}
+
+  /* matrix of cards, his Unknown Matrix */
+  .matrix{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:44px;max-width:1000px;}
+  .matrix .card h3{font-family:var(--serif);font-weight:500;font-size:24px;line-height:1.2;margin-bottom:8px;}
+  .matrix .card p{font-size:16.5px;line-height:1.5;}
+
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px;}
+  .three .card p{font-size:17px;line-height:1.5;}
+
+  /* quote card, his References slide */
+  .quotecard{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 1px 3px rgba(26,23,18,.05);
+    padding:44px 52px;max-width:760px;
+    font-size:27px;line-height:1.5;
+  }
+  .quotecard .mark{font-style:italic;}
+  .attr{margin-top:22px;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);}
+
+  /* small inline quote on content slides */
+  .quote{margin-top:28px;max-width:600px;font-size:20px;line-height:1.5;font-style:italic;}
+  .quote span{display:block;font-style:normal;font-family:var(--sans);font-size:11.5px;font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;margin-top:10px;color:var(--soft);}
+
+  #progress{position:fixed;left:0;bottom:0;height:4px;background:var(--accent);width:0%;z-index:50;transition:width .3s ease;opacity:.85;}
+</style>
+</head>
+<body>
+
+<div id="stage" role="region" aria-live="polite" aria-label="Slide deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide" id="s1">
+    <div class="center">
+      <img class="logo" src="assets/aiwf-logo.png" alt="AI Engineer World's Fair logo">
+      <h1>What 7,000 engineers just decided about <em>the future of AI</em></h1>
+      <div class="meta">San Francisco · June 29 – July 2, 2026</div>
+      <div class="meta2">A field report · 15 minutes</div>
+      <div class="snaprow">
+        <div class="snap"><img src="assets/snap-lobby.jpg" alt="Moscone West, Day 1"><div class="cap2">Moscone West, Day 1</div></div>
+        <div class="snap"><img src="assets/snap-hall.jpg" alt="The keynote hall"><div class="cap2">The keynote hall</div></div>
+        <div class="snap"><img src="assets/snap-expo.jpg" alt="The expo floor opens"><div class="cap2">The expo floor opens</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · NUMBERS -->
+  <section class="slide" id="s2">
+    <div class="eyebrow">The Event</div>
+    <h2>The largest technical AI conference in the world</h2>
+    <p class="sub">Five days at Moscone West, and a keynote schedule rewritten overnight when <span class="mark">Fable 5 returned mid-conference</span>.</p>
+    <div class="statgrid">
+      <div class="stat"><div class="n">29</div><div class="l">Tracks</div></div>
+      <div class="stat"><div class="n">~300</div><div class="l">Speakers</div></div>
+      <div class="stat"><div class="n">400+</div><div class="l">Sessions</div></div>
+      <div class="stat"><div class="n">7,000</div><div class="l">Attendees · 2× last year</div></div>
+      <div class="stat"><div class="n">100+</div><div class="l">Expo partners</div></div>
+      <div class="stat"><div class="n">$35k</div><div class="l">Hackathon prizes</div></div>
+    </div>
+  </section>
+
+  <!-- SCENES FROM THE FAIR -->
+  <section class="slide" id="s2p">
+    <div class="eyebrow">The Event</div>
+    <h2>Scenes from the fair</h2>
+    <div class="photos">
+      <div class="photo"><img src="assets/photo-entrance.jpg" alt="Moscone West entrance with the Engineering the Future of AI banner" style="object-position:center 42%"><div class="cap2">Moscone West: "Engineering the future of AI"</div></div>
+      <div class="photo"><img src="assets/photo-thariq.jpg" alt="Thariq Shihipar of Anthropic on the main stage"><div class="cap2">Thariq Shihipar (Anthropic) opens Day 3, hours after Fable was un-banned</div></div>
+      <div class="photo"><img src="assets/photo-crowd.jpg" alt="Speaker selfie with a packed keynote hall"><div class="cap2">The keynote hall: 7,000 attendees, double last year</div></div>
+      <div class="photo sm"><img src="assets/photo-paper.jpg" alt="The Daily Context conference newspaper"><div class="cap2">The Daily Context, a daily print newspaper</div></div>
+      <div class="photo sm"><img src="assets/photo-stage.jpg" alt="Speaker presenting on the main stage"><div class="cap2">90-minute keynote blocks, morning and evening</div></div>
+      <div class="photo sm"><img src="assets/photo-pills.jpg" alt="AGI Pills swag on the expo floor" style="object-position:center 30%"><div class="cap2">"AGI Pills" on the expo floor</div></div>
+      <div class="photo sm"><img src="assets/photo-sponsors.jpg" alt="Sponsor wall presented by Microsoft" style="object-position:center 20%"><div class="cap2">100+ partners, every layer of the new stack</div></div>
+    </div>
+  </section>
+
+  <!-- 3 · THE ARC (progression cards) -->
+  <section class="slide" id="s3">
+    <div class="eyebrow">The Thesis</div>
+    <h2>Each keynote day advanced one frame</h2>
+    <p class="sub">From <em>using AI tools</em> to <span class="mark">architecting systems that run AI autonomously</span>.</p>
+    <div class="prog">
+      <div class="card">
+        <span class="pill">Day 2</span>
+        <h3>Software Factories</h3>
+        <p>The raw materials for autonomous delivery exist. What's missing is the discipline to wield them.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="card">
+        <span class="pill">Day 3</span>
+        <h3>Autoresearch</h3>
+        <p>AI running research autonomously, and the day Fable 5 came back.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="card">
+        <span class="pill hot">Day 4</span>
+        <h3>Harness Engineering</h3>
+        <p>Models change. The harness is the durable asset.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · DIVIDER: QUICK HITS -->
+  <section class="slide accent" id="s4">
+    <div class="divider">
+      <svg viewBox="0 0 520 300" role="img" aria-label="Hand-drawn stick figure sprinting past five milestones">
+        <line x1="20" y1="250" x2="500" y2="250" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 9"/>
+        <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round">
+          <circle cx="368" cy="122" r="13"/>
+          <path d="M368 135 q-4 26 -12 40 M362 152 l-26 -8 M362 150 l24 12 M356 175 l-22 26 M357 174 l18 28"/>
+        </g>
+        <g fill="var(--ink)">
+          <circle cx="80" cy="250" r="5"/><circle cx="170" cy="250" r="5"/><circle cx="260" cy="250" r="5"/><circle cx="350" cy="250" r="5"/>
+        </g>
+        <circle cx="440" cy="250" r="7" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M330 210 q30 -50 34 -74" stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-dasharray="1 7" stroke-linecap="round"/>
+      </svg>
+      <div class="part">Part One</div>
+      <h2>Quick Hits</h2>
+      <div class="items">Fable · Computer Use · Personal Claws · Multiplayer · Memory · Security · Agent Readiness · Local &amp; Open Models · Valuemaxxing</div>
+    </div>
+  </section>
+
+  <!-- 5 · FABLE / ANTHROPIC -->
+  <section class="slide" id="s5f">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Fable</div>
+        <h2>Fable came back mid-conference</h2>
+        <p class="sub">Export-controlled off every cloud, un-banned overnight into Day 3. The schedule was rewritten and the first <em>"Field Guide to Fable"</em> opened the morning.</p>
+        <ul class="points">
+          <li>Models are <b>"grown, not designed"</b>: capability arrives in spikes, and the harness always lags the model.</li>
+          <li>Anthropic cut <b>80% of Claude Code's system prompt</b>. The new class wants <b>context, not constraints</b>.</li>
+          <li>Working with Fable = <b>finding your unknowns</b>: blind-spot passes, interviews, quizzes before you merge.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <div style="width:100%">
+          <div style="font-family:var(--sans);font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);text-align:center;margin-bottom:14px">The Unknown Matrix, from the talk</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="card" style="padding:18px 20px"><div class="cap">Known Knowns</div><p style="font-size:16px">What do I want?</p></div>
+            <div class="card" style="padding:18px 20px"><div class="cap">Known Unknowns</div><p style="font-size:16px">What haven't I figured out yet?</p></div>
+            <div class="card" style="padding:18px 20px"><div class="cap">Unknown Knowns</div><p style="font-size:16px">What's so obvious I'd never write it down?</p></div>
+            <div class="card" style="padding:18px 20px;background:var(--yellow-soft)"><div class="cap">Unknown Unknowns</div><p style="font-size:16px">What haven't I considered at all?</p></div>
+          </div>
+        </div>
+        <div class="snap"><img src="assets/snap-tradeoffs.jpg" alt="From the Field Guide: &quot;trade-offs are not real&quot;"><div class="cap2">From the Field Guide: &quot;trade-offs are not real&quot;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · COMPUTER USE -->
+  <section class="slide" id="s5">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Computer Use</div>
+        <h2>Computer use went background</h2>
+        <ul class="points">
+          <li>Agents now read the <b>accessibility tree</b>. No more taking over your screen.</li>
+          <li>The universal adapter for software that <b>will never ship an API</b>.</li>
+          <li>OpenAI's claim: agents can do <b>any task you can do on your own computer</b>.</li>
+        </ul>
+        <div class="quote">"The modern equivalent of tapping out text messages in Morse code."<span>The Daily Context · the counterpoint</span></div>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 360" role="img" aria-label="One observed state, three action paths: accessibility tree, pixels, foreground">
+          <rect x="92" y="22" width="236" height="146" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="92" y1="54" x2="328" y2="54" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle cx="110" cy="38" r="4" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle cx="126" cy="38" r="4" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect x="112" y="74" width="106" height="10" rx="5" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1"/>
+          <line x1="112" y1="104" x2="288" y2="104" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="112" y1="124" x2="258" y2="124" stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M294 118 l0 22 6 -6 5 11 6 -3 -5 -11 8 -1 z" fill="var(--ink)"/>
+          <text x="210" y="206" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="2" fill="var(--soft)">ONE OBSERVED STATE</text>
+          <g stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-dasharray="1 6" stroke-linecap="round">
+            <path d="M210 220 v20 M210 240 L100 272 M210 240 v32 M210 240 L320 272"/>
+          </g>
+          <text x="100" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">AX TREE</text>
+          <text x="100" y="318" text-anchor="middle" font-size="12" fill="var(--soft)">first choice</text>
+          <text x="210" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">PIXELS</text>
+          <text x="210" y="318" text-anchor="middle" font-size="12" fill="var(--soft)">fallback</text>
+          <text x="320" y="300" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">FOREGROUND</text>
+          <text x="320" y="318" text-anchor="middle" font-size="12" fill="var(--soft)">last resort</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-cu2.jpg" alt="&quot;Computer-Use 2.0&quot; in the Computer Use track (Cua)"><div class="cap2">&quot;Computer-Use 2.0&quot; in the Computer Use track (Cua)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · PERSONAL CLAWS -->
+  <section class="slide" id="s6">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Personal Claws</div>
+        <h2>Every harness becomes a claw</h2>
+        <p class="sub">A claw is a coding harness that grew <span class="mark">initiative</span>. It doesn't wait to be prompted.</p>
+        <ul class="points">
+          <li>What gets added: <b>heartbeats, daemons, memory</b>.</li>
+          <li>Claude Tag's unlock: Claude <b>wakes itself up</b> to do work.</li>
+          <li>Seen on stage: a founder texting his agent from Telegram to spin up cloud workspaces.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Hand-drawn ladder: stick figure climbing from local harness to claw, reaching a star">
+          <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round">
+            <path d="M150 340 L196 96"/>
+            <path d="M216 340 L262 96"/>
+            <path d="M160 306 h58 M170 264 h58 M179 222 h58 M188 180 h58 M197 138 h58"/>
+          </g>
+          <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round">
+            <circle cx="238" cy="76" r="11"/>
+            <path d="M235 87 q-6 22 -2 34 M234 100 l-22 10 M234 98 l20 -16 M233 121 l-16 24 M234 121 l14 22"/>
+          </g>
+          <path d="M262 52 l5 12 13 1 -10 9 3 13 -11 -7 -11 7 3 -13 -10 -9 13 -1 z" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M120 344 q90 10 200 0" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="1 8"/>
+          <g font-size="13" font-weight="700" fill="var(--ink)">
+            <text x="30" y="316">2024 · local</text>
+            <text x="30" y="232">2025 · cloud</text>
+            <text x="30" y="120">2026 · claw</text>
+          </g>
+          <g font-size="11.5" fill="var(--soft)">
+            <text x="30" y="334">you prompt, it stops</text>
+            <text x="30" y="250">survives a closed laptop</text>
+            <text x="30" y="138">wakes itself up</text>
+          </g>
+        </svg>
+        <div class="snap"><img src="assets/snap-claw.jpg" alt="Sam Bhagwat (Mastra): &quot;Every harness will become a claw&quot;"><div class="cap2">Sam Bhagwat (Mastra): &quot;Every harness will become a claw&quot;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · MULTIPLAYER -->
+  <section class="slide" id="s7">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Multiplayer</div>
+        <h2>Agents went multiplayer</h2>
+        <p class="sub">The unit of work is no longer one engineer, one agent, one terminal.</p>
+        <ul class="points">
+          <li><b>Humans around agents:</b> shared live workspaces. "Orchestras, not factories."</li>
+          <li><b>Agents pulling humans in:</b> Claude Tag wakes itself; Cursor's agents page the researchers.</li>
+          <li><b>Agents with agents:</b> "a big trend in the next six months."</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 370" role="img" aria-label="Three hand-drawn concentric rings around shared context">
+          <g fill="none" stroke="var(--ink)" stroke-linecap="round">
+            <circle cx="210" cy="185" r="148" stroke-width="2" stroke-dasharray="1 8"/>
+            <circle cx="210" cy="185" r="98" stroke-width="2"/>
+          </g>
+          <circle cx="210" cy="185" r="46" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="210" y="181" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">SHARED</text>
+          <text x="210" y="197" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">CONTEXT</text>
+          <text x="210" y="116" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="var(--soft)" stroke="var(--cream)" stroke-width="6" paint-order="stroke">AGENTS ⇄ HUMANS</text>
+          <text x="210" y="64" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="var(--soft)" stroke="var(--cream)" stroke-width="6" paint-order="stroke">HUMANS AROUND AGENTS</text>
+          <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round">
+            <circle cx="64" cy="150" r="9"/>
+            <path d="M64 159 v20 M54 166 h20 M64 179 l-9 15 M64 179 l9 15"/>
+            <circle cx="356" cy="150" r="9"/>
+            <path d="M356 159 v20 M346 166 h20 M356 179 l-9 15 M356 179 l9 15"/>
+          </g>
+          <text x="210" y="362" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="var(--soft)">AGENTS ⇄ AGENTS · "THE NEXT SIX MONTHS"</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMORY & PERSONALIZATION -->
+  <section class="slide" id="s7m">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Memory</div>
+        <h2>Memory is personalization, and it can't be outsourced</h2>
+        <ul class="points">
+          <li>Every top consumer AI built its own memory. The surprise: <b>neither ChatGPT nor Claude ever used RAG</b> for it.</li>
+          <li>The converged pattern: a <b>running profile, visible and editable</b>, plus search tools. Its size is a <b>GPU-budget decision</b>.</li>
+          <li>Continual learning is already here, <b>outside the weights</b>: memory vaults, pinned threads, agents that "act and write back."</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 360" role="img" aria-label="The memory stack: profile, memory base, raw log, weights">
+          <g font-size="15" font-weight="700" fill="var(--ink)">
+            <rect x="60" y="42" width="300" height="58" rx="12" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="210" y="68" text-anchor="middle">PROFILE</text>
+            <text x="210" y="88" text-anchor="middle" font-size="11.5" font-weight="500">running · visible · editable</text>
+            <rect x="60" y="114" width="300" height="58" rx="12" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="210" y="140" text-anchor="middle">MEMORY BASE</text>
+            <text x="210" y="160" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--soft)">the agent writes back</text>
+            <rect x="60" y="186" width="300" height="58" rx="12" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+            <text x="210" y="212" text-anchor="middle">RAW LOG</text>
+            <text x="210" y="232" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--soft)">"the log is the agent" · never keep only the summary</text>
+            <rect x="60" y="258" width="300" height="58" rx="12" fill="var(--card)" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="6 5"/>
+            <text x="210" y="284" text-anchor="middle" fill="var(--soft)">WEIGHTS</text>
+            <text x="210" y="304" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--soft)">fine-tune · the open question</text>
+          </g>
+          <text x="210" y="348" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">MEMORY IS A STACK, NOT A FEATURE</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-memory.jpg" alt="&quot;Self-improvement and memory,&quot; from the main stage"><div class="cap2">&quot;Self-improvement and memory,&quot; from the main stage</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY -->
+  <section class="slide" id="s7s">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Security</div>
+        <h2>Security got its own room</h2>
+        <p class="sub">The first-ever dedicated Security track, because agents made prompt injection "a bigger problem than SQL injection ever was."</p>
+        <ul class="points">
+          <li>The <b>lethal trifecta</b>: private data + untrusted content + tools. An agent with all three is unsafe <em>while reasoning</em>.</li>
+          <li>The consensus: <b>treat the agent as an adversary</b>. MicroVMs, network allow-lists, its own identity, ephemeral runtimes.</li>
+          <li>The elegant bit: <b>credential injection</b>. Secrets <em>usable by</em> the agent, never <em>accessible to</em> it.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 380" role="img" aria-label="The lethal trifecta: private data, untrusted content, and tools overlap in a danger zone">
+          <g fill="none" stroke="var(--ink)" stroke-width="2">
+            <circle cx="160" cy="140" r="92"/>
+            <circle cx="260" cy="140" r="92"/>
+            <circle cx="210" cy="228" r="92"/>
+          </g>
+          <circle cx="210" cy="168" r="26" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="210" y="174" text-anchor="middle" font-size="18" font-weight="700">⚠</text>
+          <text x="118" y="90" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)" stroke="var(--cream)" stroke-width="6" paint-order="stroke">PRIVATE DATA</text>
+          <text x="306" y="90" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)" stroke="var(--cream)" stroke-width="6" paint-order="stroke">UNTRUSTED CONTENT</text>
+          <text x="210" y="342" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)" stroke="var(--cream)" stroke-width="6" paint-order="stroke">TOOLS</text>
+          <text x="210" y="376" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">ALL THREE TOGETHER = THE LETHAL TRIFECTA</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-threat.jpg" alt="Threat modeling, live in the Security track"><div class="cap2">Threat modeling, live in the Security track</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGENT READINESS -->
+  <section class="slide" id="s8">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Agent Readiness</div>
+        <h2>When agents fail, it's the environment, not the model</h2>
+        <ul class="points">
+          <li>Unprepared codebases degrade <b>3–16× more</b> after agent adoption. Same models, same speed.</li>
+          <li>In prepared pipelines, AI-written PRs already <b>match or beat human quality</b>.</li>
+          <li>Readiness is measurable: an eight-dimension hygiene check of your codebase.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 360" role="img" aria-label="Hand-drawn chart: structured repos hold quality, ad-hoc repos fall off a cliff, a 3 to 16 times gap">
+          <line x1="50" y1="180" x2="370" y2="180" stroke="var(--line)" stroke-width="1.5"/>
+          <path d="M50 180 C 150 172, 260 158, 360 140" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M50 180 C 140 194, 230 240, 330 318" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1 8"/>
+          <text x="52" y="164" font-size="12" font-weight="700" fill="var(--soft)">AGENTS ADOPTED</text>
+          <text x="368" y="128" text-anchor="end" font-size="13.5" font-weight="700" fill="var(--ink)">STRUCTURED REPO</text>
+          <text x="336" y="342" text-anchor="end" font-size="13.5" font-weight="700" fill="var(--ink)">AD-HOC REPO</text>
+          <path d="M376 142 v172" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="1 6" stroke-linecap="round"/>
+          <g transform="translate(388,226)">
+            <text font-size="19" font-weight="700" fill="var(--accent)" transform="rotate(90)" text-anchor="middle">3–16×</text>
+          </g>
+        </svg>
+        <div class="snap"><img src="assets/snap-reverts.jpg" alt="Greptile&#39;s revert-rate data on the big screen"><div class="cap2">Greptile&#39;s revert-rate data on the big screen</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · LOCAL & OPEN MODELS -->
+  <section class="slide" id="s9">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Local &amp; Open Models</div>
+        <h2>The frontier is only six months ahead of open</h2>
+        <ul class="points">
+          <li><b>GLM-5.2</b> lands "between Opus 4.7 and 4.8" on the hardest agentic benchmarks.</li>
+          <li><b>MiniMax M3:</b> top-five, natively multimodal, 1M context, open weights.</li>
+          <li>The subtext is political: with frontier releases government-gated, <b>capability you can hold cannot be revoked</b>.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 360" role="img" aria-label="Bar chart: open models close behind the frontier">
+          <g font-size="14" font-weight="700" fill="var(--ink)">
+            <text x="30" y="56" class="serif" font-size="16">Fable 5</text>
+            <rect x="30" y="66" width="360" height="24" rx="12" fill="var(--ink)"/>
+            <text x="30" y="132" class="serif" font-size="16">Opus 4.8</text>
+            <rect x="30" y="142" width="326" height="24" rx="12" fill="var(--ink)" opacity=".5"/>
+            <text x="30" y="208" class="serif" font-size="16">GLM-5.2</text>
+            <rect x="30" y="218" width="306" height="24" rx="12" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="30" y="284" class="serif" font-size="16">MiniMax M3</text>
+            <rect x="30" y="294" width="278" height="24" rx="12" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          </g>
+          <text x="346" y="235" font-size="11.5" font-weight="700" fill="var(--accent)">OPEN</text>
+          <text x="318" y="311" font-size="11.5" font-weight="700" fill="var(--accent)">OPEN</text>
+          <text x="30" y="348" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">OPEN WEIGHT ≠ OPEN SOURCE</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-day2.jpg" alt="Day 2 main stage: the GLM-5.2 and MiniMax keynotes"><div class="cap2">Day 2 main stage: the GLM-5.2 and MiniMax keynotes</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUEMAXXING -->
+  <section class="slide" id="s9v">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Quick Hit · Valuemaxxing</div>
+        <h2>Tokenmaxxing is out. Valuemaxxing is in.</h2>
+        <p class="sub">OpenAI's coinage for the year's economic turn: measure what agents <em>accomplish</em>, not what they burn.</p>
+        <ul class="points">
+          <li>The bottleneck moved: <b>tokens → compute → attention</b>. "Unlike tokens, I can't simply add more of it."</li>
+          <li>Right-size the model: <b>"using Opus to summarize a Slack thread is a bad choice."</b></li>
+          <li>One 16.5-hour mission: 779M tokens, and <b>745M were cache reads</b>. The cache-hit ratio is the whole cost story.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 360" role="img" aria-label="The scarce resource moved from tokens to compute to attention">
+          <text x="210" y="34" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="var(--soft)">THE SCARCE RESOURCE KEEPS MOVING</text>
+          <g font-size="15" font-weight="700" fill="var(--ink)">
+            <rect x="120" y="60" width="180" height="52" rx="26" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="210" y="91" text-anchor="middle" fill="var(--soft)" style="text-decoration:line-through">TOKENS</text>
+            <rect x="120" y="146" width="180" height="52" rx="26" fill="var(--card)" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="210" y="177" text-anchor="middle" fill="var(--soft)" style="text-decoration:line-through">COMPUTE</text>
+            <rect x="120" y="232" width="180" height="52" rx="26" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+            <text x="210" y="263" text-anchor="middle">ATTENTION</text>
+          </g>
+          <g stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="1 6">
+            <path d="M210 112 v34 M210 198 v34"/>
+          </g>
+          <text x="210" y="312" text-anchor="middle" font-size="12" font-weight="500" fill="var(--soft)" class="serif" font-style="italic">"the most important skill today is deciding where to spend it"</text>
+          <text x="210" y="348" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">VALUE PER UNIT OF ATTENTION, NOT PER TOKEN</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-value.jpg" alt="&quot;Building&#39;s easier. Generating value is still hard.&quot;"><div class="cap2">&quot;Building&#39;s easier. Generating value is still hard.&quot;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER: DEEP DIVES -->
+  <section class="slide accent" id="s10">
+    <div class="divider">
+      <svg viewBox="0 0 520 300" role="img" aria-label="Hand-drawn stick figure diving head-first into water">
+        <!-- water -->
+        <path d="M50 252 q60 -12 120 0 t120 0 t120 0 t60 0" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- dotted flight arc -->
+        <path d="M140 90 Q 240 42, 316 120" stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-dasharray="1 8" stroke-linecap="round"/>
+        <!-- diver: head-first at 45°, arms extended toward water -->
+        <g stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round">
+          <!-- body: hips upper-left to shoulders lower-right -->
+          <path d="M330 138 L365 176"/>
+          <!-- head below shoulders, leading the dive -->
+          <circle cx="376" cy="188" r="11" fill="var(--yellow)" stroke-width="2.5"/>
+          <!-- arms: from shoulders, stretched ahead of head toward water -->
+          <path d="M365 176 L398 214 M365 176 L385 222"/>
+          <!-- legs: from hips, trailing up behind, slightly split -->
+          <path d="M330 138 L312 106 M330 138 L346 102"/>
+        </g>
+        <!-- splash where arms meet water -->
+        <g stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round">
+          <path d="M414 244 q6 -10 2 -18 M428 246 q8 -12 2 -22 M400 246 q-2 -8 -8 -12"/>
+        </g>
+      </svg>
+      <div class="part">Part Two</div>
+      <h2>Deep Dives</h2>
+      <div class="items">Loops · Evals + Harness · Context Engineering</div>
+    </div>
+  </section>
+
+  <!-- 11 · LOOPS -->
+  <section class="slide" id="s11">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Deep Dive · Loops</div>
+        <h2>Stop prompting agents. Design loops that prompt them.</h2>
+        <ul class="points">
+          <li>Blind loops produce <b>40,000-line PRs nobody reads</b>.</li>
+          <li>Control loops make <b>small, verified changes</b>: cost and risk bounded by design.</li>
+          <li>Factory's missions spend <b>~40% of runtime on validators</b> that never write code.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Loop maturity ladder from blind loops to recursive model improvement">
+          <path d="M36 322 C 30 240, 42 160, 36 72" stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="1 7"/>
+          <g font-size="16" font-weight="500" fill="var(--ink)" font-family="var(--serif)">
+            <text x="70" y="72" class="serif">Recursive model improvement</text>
+            <text x="70" y="136" class="serif">Org learning loops</text>
+            <text x="70" y="200" class="serif">Nested verification loops</text>
+            <text x="70" y="264" class="serif">Control loops</text>
+            <text x="70" y="328" class="serif" fill="var(--soft)">Blind loops</text>
+          </g>
+          <g font-size="12" fill="var(--soft)">
+            <text x="70" y="92">judges training the next models</text>
+            <text x="70" y="156">production signal becomes evals</text>
+            <text x="70" y="220">agent → CI → maintenance</text>
+            <text x="70" y="284">small verified increments</text>
+            <text x="70" y="348">don't</text>
+          </g>
+          <g>
+            <circle cx="36" cy="66" r="9" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+            <circle cx="36" cy="130" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="36" cy="194" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="36" cy="258" r="7" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="36" cy="322" r="7" fill="var(--card)" stroke="var(--line)" stroke-width="2"/>
+          </g>
+          <text x="8" y="376" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">EVERY RUNG UP ADDS A VERIFIER, NOT A PROMPT</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-loops.jpg" alt="Agentic control loops (HumanLayer, Day 2)"><div class="cap2">Agentic control loops (HumanLayer, Day 2)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · EVALS -->
+  <section class="slide" id="s12">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Deep Dive · Evals + Harness</div>
+        <h2>"Vibe-based engineering is dead"</h2>
+        <ul class="points">
+          <li><b>Evals have a half-life.</b> When every model scores ~90%, retire it. Instruction-following got <b>10× better in one year</b>.</li>
+          <li><b>Models now attack the evals:</b> caught mining git history and web forks for answers. Keep evals private and held out.</li>
+          <li>The missing benchmark is <b>maintainability</b>. Until it's trainable: <span class="mark">we're stuck reading the code</span>.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Successive evals decay in usefulness as models improve">
+          <g stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round">
+            <line x1="60" y1="50" x2="60" y2="310"/>
+            <line x1="60" y1="310" x2="390" y2="310"/>
+          </g>
+          <path d="M60 70 C 110 76, 145 160, 180 300" stroke="var(--ink)" stroke-width="2.5" fill="none" opacity=".22" stroke-linecap="round"/>
+          <path d="M145 70 C 195 76, 230 160, 265 300" stroke="var(--ink)" stroke-width="2.5" fill="none" opacity=".45" stroke-linecap="round"/>
+          <path d="M230 70 C 280 76, 315 160, 350 300" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="60" cy="70" r="7" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="145" cy="70" r="7" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          <circle cx="230" cy="70" r="7" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="78" y="56" font-size="12" font-weight="700" fill="var(--soft)">eval v1</text>
+          <text x="163" y="56" font-size="12" font-weight="700" fill="var(--soft)">v2</text>
+          <text x="248" y="56" font-size="12" font-weight="700" fill="var(--soft)">v3 …</text>
+          <text x="390" y="334" text-anchor="end" font-size="11.5" font-weight="700" fill="var(--soft)">MODEL PROGRESS →</text>
+          <text x="52" y="180" font-size="11.5" font-weight="700" fill="var(--soft)" transform="rotate(-90 52 180)" text-anchor="middle">USEFULNESS</text>
+          <text x="8" y="372" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">EVAL-BUILDING IS A TREADMILL, NOT A PROJECT</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-misbehavior.jpg" alt="Vending-Bench: &quot;(mis)behavior found&quot;"><div class="cap2">Vending-Bench: &quot;(mis)behavior found&quot;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 13 · CONTEXT ENGINEERING -->
+  <section class="slide" id="s13">
+    <div class="cols">
+      <div>
+        <div class="eyebrow">Deep Dive · Context Engineering</div>
+        <h2>Agents get bad after ~100k tokens</h2>
+        <ul class="points">
+          <li>Enterprise reality: <b>~330 tools, ~47k tokens of schemas</b>, and 5% of sessions use one.</li>
+          <li>The fix: <b>progressive disclosure</b>, a compact index up front, detail loaded on demand.</li>
+          <li>The live debate: <b>curate</b> for control, or <b>discover</b>: "I don't filter anything."</li>
+        </ul>
+        <div class="card" style="margin-top:26px;max-width:600px;padding:20px 24px">
+          <div class="cap">Progressive disclosure, in one line</div>
+          <p style="font-size:16.5px">A menu says <i>"Tiramisu, $9,"</i> not the recipe. The agent's tool index works the same way: one line per tool, and the full 2,000-token schema loads only when it actually reaches for it.</p>
+        </div>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Deferred context: compact index in the window, detail loaded on demand">
+          <rect x="40" y="42" width="150" height="296" rx="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          <text x="115" y="28" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.5" fill="var(--soft)">CONTEXT WINDOW</text>
+          <rect x="58" y="62" width="114" height="30" rx="8" fill="var(--yellow)" stroke="var(--accent)" stroke-width="1"/>
+          <text x="115" y="82" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">INDEX</text>
+          <g stroke="var(--ink)" stroke-width="1.5" stroke-linecap="round">
+            <line x1="58" y1="116" x2="172" y2="116"/>
+            <line x1="58" y1="140" x2="172" y2="140"/>
+            <line x1="58" y1="164" x2="172" y2="164"/>
+          </g>
+          <text x="115" y="238" text-anchor="middle" font-size="12" fill="var(--soft)">head-room</text>
+          <text x="115" y="256" text-anchor="middle" font-size="12" fill="var(--soft)">stays free</text>
+          <g font-size="14" font-weight="700" fill="var(--ink)">
+            <text x="262" y="88">Tool schemas</text>
+            <text x="262" y="168">Skill branches</text>
+            <text x="262" y="248">Retrieval depth</text>
+          </g>
+          <g stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-dasharray="1 6" stroke-linecap="round">
+            <path d="M254 84 H206"/><path d="M254 164 H206"/><path d="M254 244 H206"/>
+          </g>
+          <g stroke="var(--ink)" stroke-width="1.5" fill="none" stroke-linecap="round">
+            <path d="M206 84 l9 -6 m-9 6 l9 6 M206 164 l9 -6 m-9 6 l9 6 M206 244 l9 -6 m-9 6 l9 6"/>
+          </g>
+          <text x="262" y="108" font-size="12" fill="var(--soft)">loaded on demand</text>
+          <text x="40" y="372" font-size="11.5" font-weight="700" letter-spacing="1" fill="var(--soft)">HIDDEN, NOT REMOVED · 50%+ TOKEN SAVINGS</text>
+        </svg>
+        <div class="snap"><img src="assets/snap-elephant.jpg" alt="&quot;Context is the elephant in the room&quot;"><div class="cap2">&quot;Context is the elephant in the room&quot;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 · SYNTHESIS (three cards, his matrix style) -->
+  <section class="slide" id="s14">
+    <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+      <div class="eyebrow">The Through-Line</div>
+      <h2>The model is no longer the limiting factor.<br><span class="mark">The evidence layer is.</span></h2>
+      <div class="three">
+        <div class="card">
+          <div class="cap">The Hedge</div>
+          <p>Every camp agreed: whoever builds the best <b>verifiers</b> owns the chokepoint.</p>
+        </div>
+        <div class="card">
+          <div class="cap">The Scarce Resource</div>
+          <p>Not tokens but <b>attention</b>. "The most important skill is deciding where to spend it."</p>
+        </div>
+        <div class="card">
+          <div class="cap">The Open Question</div>
+          <p>The human's job (factory manager, conductor, or code reader) was left <b>productively unresolved</b>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 · FOR US (2x2 card matrix, his Unknown Matrix layout) -->
+  <section class="slide" id="s15">
+    <div style="height:100%;display:flex;flex-direction:column;justify-content:center;">
+      <div class="eyebrow">So What</div>
+      <h2>Four moves worth making</h2>
+      <div class="matrix">
+        <div class="card">
+          <div class="cap">Readiness</div>
+          <h3>Run the readiness audit</h3>
+          <p>Score our repos on the eight dimensions before scaling agents. The 3–16× gap is the cost of skipping it.</p>
+        </div>
+        <div class="card">
+          <div class="cap">Evals</div>
+          <h3>Get on the eval treadmill</h3>
+          <p>Private, held-out evals from our own codebase. Budget for continuous rebuilds.</p>
+        </div>
+        <div class="card">
+          <div class="cap">Context</div>
+          <h3>Treat context as infrastructure</h3>
+          <p>Progressive disclosure everywhere. Stop dumping into the window.</p>
+        </div>
+        <div class="card">
+          <div class="cap">Autonomy</div>
+          <h3>Watch, don't chase</h3>
+          <p>Lights-off factories are spectator sports this year. Even their advocates say so.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 · CLOSE (quote card, his References style) -->
+  <section class="slide" id="sEnd">
+    <div class="center">
+      <div class="eyebrow" style="margin-bottom:30px">Closing</div>
+      <div class="quotecard">"We're stuck reading the code." <span class="mark">For now, and that's the job.</span></div>
+      <div class="attr">Questions · Discussion</div>
+      <div class="snap" style="align-self:center;margin-top:22px;transform:rotate(-2deg)"><img src="assets/snap-explore.jpg" alt="Thariq&#39;s closing slide: &quot;Go explore. Make it real.&quot;"><div class="cap2">Thariq&#39;s closing slide: &quot;Go explore. Make it real.&quot;</div></div>
+      <img src="assets/aiwf-logo.png" alt="AI Engineer World's Fair logo" style="width:170px;margin-top:48px;border-radius:6px;">
+    </div>
+  </section>
+
+<div class="pg" id="pgnum" aria-hidden="true"></div>
+</div>
+
+<div id="progress"></div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const stage=document.getElementById('stage');
+  const progress=document.getElementById('progress');
+  let i=Math.min(Math.max((parseInt(location.hash.slice(1),10)||1)-1,0),slides.length-1);
+
+  function fit(){
+    const s=Math.min(innerWidth/1280,innerHeight/720);
+    stage.style.transform=`translate(-50%,-50%) scale(${s})`;
+  }
+  const pg=document.getElementById('pgnum');
+  function show(n){
+    i=Math.min(Math.max(n,0),slides.length-1);
+    slides.forEach((sl,k)=>sl.classList.toggle('active',k===i));
+    progress.style.width=((i+1)/slides.length*100)+'%';
+    pg.textContent=(i+1)+' / '+slides.length;
+    history.replaceState(null,'','#'+(i+1));
+  }
+  addEventListener('resize',fit);
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();show(i+1);}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();show(i-1);}
+    else if(e.key==='Home'){show(0);}
+    else if(e.key==='End'){show(slides.length-1);}
+    else if(e.key==='f'||e.key==='F'){
+      document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+    }
+  });
+  addEventListener('fullscreenchange',fit);
+  addEventListener('click',e=>{
+    if(e.target.closest('a'))return;
+    (e.clientX<innerWidth*0.2)?show(i-1):show(i+1);
+  });
+  let tx=null;
+  addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+  addEventListener('touchend',e=>{
+    if(tx===null)return;
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>50)show(i+(dx<0?1:-1));
+    tx=null;
+  },{passive:true});
+  fit();show(i);
+})();
+</script>
+</body>
+</html>
