@@ -311,6 +311,7 @@
     </div>
   </section>
 
+  <!-- HERMES phone demo column is injected on the claws slide -->
   <!-- 6 · COMPUTER USE -->
   <section class="slide" id="s5">
     <div class="cols">
@@ -352,7 +353,7 @@
 
   <!-- 6 · PERSONAL CLAWS -->
   <section class="slide" id="s6">
-    <div class="cols">
+    <div class="cols" style="grid-template-columns:1fr .68fr .4fr;gap:52px">
       <div>
         <div class="eyebrow">Quick Hit · Personal Claws</div>
         <h2>Every harness becomes a claw</h2>
@@ -388,6 +389,14 @@
           </g>
         </svg>
         <div class="snap"><img src="assets/snap-claw.jpg" alt="Sam Bhagwat (Mastra): &quot;Every harness will become a claw&quot;"><div class="cap2">Sam Bhagwat (Mastra): &quot;Every harness will become a claw&quot;</div></div>
+      </div>
+      <div class="fig">
+        <div class="vid" style="width:100%">
+          <video id="clawreel" muted playsinline preload="auto"
+                 data-reel='[{"src":"assets/clip-hermes.mp4","cap":"Live example: texting my claw, Hermes, from my phone (3× speed)"},{"src":"assets/clip-dispatch.mp4","cap":"Live example: dispatching work with Claude Dispatch"}]'
+                 style="height:414px;object-fit:contain"></video>
+          <div class="cap2" id="clawreelcap">Live example: texting my claw, Hermes, from my phone (3&times; speed)</div>
+        </div>
       </div>
     </div>
   </section>
@@ -840,6 +849,16 @@
       if(slides[i].contains(v)){v.currentTime=0;v.play().catch(()=>{});}
       else v.pause();
     });
+  }
+  // claws slide: one phone frame cycling multiple recordings
+  const reel=document.getElementById('clawreel');
+  if(reel){
+    const items=JSON.parse(reel.dataset.reel);
+    const cap=document.getElementById('clawreelcap');
+    let r=0;
+    const load=()=>{reel.src=items[r].src;cap.textContent=items[r].cap;reel.play().catch(()=>{});};
+    reel.addEventListener('ended',()=>{r=(r+1)%items.length;load();});
+    load();reel.pause();
   }
   addEventListener('resize',fit);
   addEventListener('keydown',e=>{
